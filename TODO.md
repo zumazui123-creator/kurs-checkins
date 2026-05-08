@@ -38,11 +38,24 @@ Hier findest du den aktuellen Fortschritt und die geplanten Schritte für die **
 - [x] **QR-Scanner**
     - [x] Integration von `mobile_scanner`
     - [x] Scan-UX (Vibration, Rahmen-Animation)
+    - [x] Audio-Feedback (Erfolg/Fehler Sounds)
     - [ ] Dubletten-Check beim Einchecken
 
 ---
 
-## 🎨 Phase 4: Polishing & Deployment
+## 🌐 Phase 4: Lokales Hosting & Backend
+- [x] **Backend Setup**
+    - [x] Dart Frog Server initialisiert
+    - [x] REST-Endpoints für Anwesenheit (`GET`, `POST`)
+    - [x] In-Memory Datenspeicherung auf dem Server
+- [x] **Client-Anbindung**
+    - [x] HTTP-Client (Dio) im Flutter-Projekt
+    - [x] Provider auf Async-Datenfluss umgestellt
+    - [x] Automatische Synchronisation (Refresh) integriert
+
+---
+
+## 🎨 Phase 5: Polishing & Deployment
 - [ ] **Modernes UI/UX**
     - [ ] Dark Mode Support
     - [ ] Responsive Layouts für Web/Tablet

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../../services/audio_service.dart';
 import 'package:uuid/uuid.dart';
 import '../../attendance/domain/attendee.dart';
 import '../../attendance/providers/attendance_provider.dart';
@@ -37,11 +38,12 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
               id: const Uuid().v4(),
               firstName: data['firstName'],
               lastName: data['lastName'],
-              course: 'Scan-Kurs', // Default for now
+              course: 'Scan-Kurs',
               checkinTime: DateTime.now(),
             );
 
-            ref.read(attendanceProvider.notifier).addAttendee(attendee);
+            await ref.read(attendanceProvider.notifier).addAttendee(attendee);
+            await AudioService.playSuccess();
 
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -51,8 +53,11 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                 ),
               );
             }
+          } else {
+            throw Exception('Invalid format');
           }
         } catch (e) {
+          await AudioService.playError();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

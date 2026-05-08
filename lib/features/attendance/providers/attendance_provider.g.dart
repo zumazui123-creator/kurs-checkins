@@ -13,7 +13,7 @@ part of 'attendance_provider.dart';
 final attendanceProvider = AttendanceProvider._();
 
 final class AttendanceProvider
-    extends $NotifierProvider<Attendance, List<Attendee>> {
+    extends $AsyncNotifierProvider<Attendance, List<Attendee>> {
   AttendanceProvider._()
     : super(
         from: null,
@@ -31,29 +31,21 @@ final class AttendanceProvider
   @$internal
   @override
   Attendance create() => Attendance();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<Attendee> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<Attendee>>(value),
-    );
-  }
 }
 
-String _$attendanceHash() => r'a7fbd48dd1ee04098807cb3ac332ec17260695f3';
+String _$attendanceHash() => r'b784dc7f4d78eb25fcaa16d60dd2b338a9c889b3';
 
-abstract class _$Attendance extends $Notifier<List<Attendee>> {
-  List<Attendee> build();
+abstract class _$Attendance extends $AsyncNotifier<List<Attendee>> {
+  FutureOr<List<Attendee>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<List<Attendee>, List<Attendee>>;
+    final ref = this.ref as $Ref<AsyncValue<List<Attendee>>, List<Attendee>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<Attendee>, List<Attendee>>,
-              List<Attendee>,
+              AnyNotifier<AsyncValue<List<Attendee>>, List<Attendee>>,
+              AsyncValue<List<Attendee>>,
               Object?,
               Object?
             >;
