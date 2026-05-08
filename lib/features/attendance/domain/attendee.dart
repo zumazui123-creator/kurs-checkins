@@ -5,7 +5,7 @@ part 'attendee.freezed.dart';
 part 'attendee.g.dart';
 
 @freezed
-class Attendee with _$Attendee {
+abstract class Attendee with _$Attendee {
   const factory Attendee({
     required String id,
     @JsonKey(name: 'first_name') required String firstName,

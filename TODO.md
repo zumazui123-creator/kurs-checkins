@@ -48,6 +48,8 @@ Hier findest du den aktuellen Fortschritt und die geplanten Schritte für die **
     - [x] Dart Frog Server initialisiert
     - [x] REST-Endpoints für Anwesenheit (`GET`, `POST`)
     - [x] In-Memory Datenspeicherung auf dem Server
+    - [x] Web-Dashboard zur Anzeige der Liste (HTML)
+    - [x] Server-seitiger CSV-Export (/export)
 - [x] **Client-Anbindung**
     - [x] HTTP-Client (Dio) im Flutter-Projekt
     - [x] Provider auf Async-Datenfluss umgestellt

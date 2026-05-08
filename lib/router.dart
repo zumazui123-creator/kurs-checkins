@@ -3,12 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'widgets/scaffold_with_navbar.dart';
 
+import 'features/attendance/presentation/attendance_screen.dart';
+import 'features/qr/presentation/qr_generator_screen.dart';
 import 'features/qr/presentation/qr_scanner_screen.dart';
 
 part 'router.g.dart';
 
 @riverpod
-GoRouter router(RouterRef ref) {
+GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [

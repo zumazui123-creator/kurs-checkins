@@ -1,40 +1,33 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
-
-// In-memory storage for simplicity. 
-// In a real app, this would be a database or a file.
-final List<Map<String, dynamic>> _attendees = [];
+import 'package:server/repository.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  switch (context.request.method) {
-    case HttpMethod.get:
-      return _getAttendees(context);
-    case HttpMethod.post:
-      return _addAttendee(context);
-    case HttpMethod.delete:
-      return _clearAttendees(context);
-    default:
-      return Response(statusCode: HttpStatus.methodNotAllowed);
-  }
+  final repository = context.read<AttendeeRepository>();
+
+  return switch (context.request.method) {
+    HttpMethod.get => _getAttendees(repository),
+    HttpMethod.post => _addAttendee(context, repository),
+    HttpMethod.delete => _clearAttendees(repository),
+    _ => Response(statusCode: HttpStatus.methodNotAllowed),
+  };
 }
 
-Future<Response> _getAttendees(RequestContext context) async {
-  return Response.json(body: _attendees);
+Future<Response> _getAttendees(AttendeeRepository repository) async {
+  return Response.json(body: repository.attendees);
 }
 
-Future<Response> _addAttendee(RequestContext context) async {
+Future<Response> _addAttendee(RequestContext context, AttendeeRepository repository) async {
   final body = await context.request.json();
   if (body is Map<String, dynamic>) {
-    // Add timestamp if not present
     body['checkin_time'] ??= DateTime.now().toIso8601String();
-    _attendees.add(body);
+    repository.add(body);
     return Response.json(body: body, statusCode: HttpStatus.created);
   }
   return Response(statusCode: HttpStatus.badRequest);
 }
 
-Future<Response> _clearAttendees(RequestContext context) async {
-  _attendees.clear();
+Future<Response> _clearAttendees(AttendeeRepository repository) async {
+  repository.clear();
   return Response(statusCode: HttpStatus.noContent);
 }

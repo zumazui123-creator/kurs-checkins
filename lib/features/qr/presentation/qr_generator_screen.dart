@@ -80,7 +80,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withOpacity(0.1),
+                          color: theme.colorScheme.shadow.withValues(alpha: 0.1),
                           blurRadius: 10,
                           spreadRadius: 5,
                         ),

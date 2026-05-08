@@ -77,7 +77,7 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedCourse,
+                initialValue: _selectedCourse,
                 decoration: const InputDecoration(
                   labelText: 'Kurs',
                   prefixIcon: Icon(Icons.book_outlined),

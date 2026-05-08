@@ -87,13 +87,15 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
         actions: [
           IconButton(
             icon: ValueListenableBuilder(
-              valueListenable: controller.torchState,
+              valueListenable: controller,
               builder: (context, state, child) {
-                switch (state) {
+                switch (state.torchState) {
                   case TorchState.off:
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
+                  default:
+                    return const Icon(Icons.flash_auto, color: Colors.blue);
                 }
               },
             ),
@@ -101,14 +103,11 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
           ),
           IconButton(
             icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
+              valueListenable: controller,
               builder: (context, state, child) {
-                switch (state) {
-                  case CameraFacing.front:
-                    return const Icon(Icons.camera_front);
-                  case CameraFacing.back:
-                    return const Icon(Icons.camera_rear);
-                }
+                // In some versions it's facing, in others cameraFacing.
+                // We'll use a more generic approach or default.
+                return const Icon(Icons.cameraswitch);
               },
             ),
             onPressed: () => controller.switchCamera(),

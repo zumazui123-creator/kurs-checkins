@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'api_client.g.dart';
 
 @riverpod
-Dio apiClient(ApiClientRef ref) {
+Dio apiClient(Ref ref) {
   // ACHTUNG: Ersetze 'localhost' durch deine lokale IP-Adresse (z.B. 192.168.178.XX),
   // damit mobile Geräte im WLAN den Server finden können.
   return Dio(BaseOptions(

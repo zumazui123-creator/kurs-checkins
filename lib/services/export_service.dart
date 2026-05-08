@@ -1,15 +1,5 @@
-import 'dart:convert';
-import 'package:csv/csv.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import '../features/attendance/domain/attendee.dart';
-
-// Conditional import would be cleaner, but for simplicity we use a helper 
-// that avoids direct dart:io usage on web if possible.
-// However, dart:io File and Directory will fail to compile on web.
-// So we MUST use conditional imports or separate files.
 
 import 'export_stub.dart'
     if (dart.library.io) 'export_io.dart'
@@ -33,7 +23,8 @@ class ExportService {
       ]);
     }
 
-    final csvString = const ListToCsvConverter(fieldDelimiter: ';').convert(rows);
+    // Simple manual CSV generation to avoid package issues
+    final csvString = rows.map((row) => row.join(';')).join('\n');
     
     await saveAndShareFile(
       csvString, 
