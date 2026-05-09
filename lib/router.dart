@@ -6,6 +6,7 @@ import 'widgets/scaffold_with_navbar.dart';
 import 'features/attendance/presentation/attendance_screen.dart';
 import 'features/qr/presentation/qr_generator_screen.dart';
 import 'features/qr/presentation/qr_scanner_screen.dart';
+import 'features/settings/presentation/settings_screen.dart';
 
 part 'router.g.dart';
 
@@ -37,7 +38,7 @@ GoRouter router(Ref ref) {
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const PlaceholderScreen(title: 'Einstellungen'),
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),

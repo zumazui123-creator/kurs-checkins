@@ -1,15 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../features/settings/providers/settings_provider.dart';
 
-part 'api_client.g.dart';
-
-@riverpod
-Dio apiClient(Ref ref) {
-  // ACHTUNG: Ersetze 'localhost' durch deine lokale IP-Adresse (z.B. 192.168.178.XX),
-  // damit mobile Geräte im WLAN den Server finden können.
+final apiClientProvider = Provider<Dio>((ref) {
+  final settings = ref.watch(settingsProvider);
+  final baseUrl = settings.url ?? 'http://10.0.2.15:8080';
   return Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.15:8080', 
+    baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 3),
   ));
-}
+});
