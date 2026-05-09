@@ -41,6 +41,11 @@ class CourseNotifier extends Notifier<List<Course>> {
     }
   }
 
+  Future<void> importCourses(List<Course> importedCourses) async {
+    state = [...state, ...importedCourses];
+    await _save();
+  }
+
   Future<void> removeCourse(String id) async {
     state = state.where((c) => c.id != id).toList();
     await _save();

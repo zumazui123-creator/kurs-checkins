@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:gal/gal.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class QrGeneratorScreen extends StatefulWidget {
   const QrGeneratorScreen({super.key});
@@ -12,6 +16,7 @@ class QrGeneratorScreen extends StatefulWidget {
 class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _qrKey = GlobalKey();
   String _qrData = '';
 
   @override
@@ -34,6 +39,27 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
       setState(() {
         _qrData = '';
       });
+    }
+  }
+
+  Future<void> _saveQrCode() async {
+    final status = await Permission.photos.request();
+    if (!status.isGranted) return;
+
+    try {
+      final boundary = _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final pngBytes = byteData!.buffer.asUint8List();
+      
+      await Gal.putImageBytes(pngBytes);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('QR Code in Galerie gespeichert')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+      }
     }
   }
 
@@ -75,24 +101,30 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
             ),
             const SizedBox(height: 32),
             if (_qrData.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      spreadRadius: 5,
+              Column(
+                children: [
+                  RepaintBoundary(
+                    key: _qrKey,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: QrImageView(
+                        data: _qrData,
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      ),
                     ),
-                  ],
-                ),
-                child: QrImageView(
-                  data: _qrData,
-                  version: QrVersions.auto,
-                  size: 200.0,
-                ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _saveQrCode,
+                    icon: const Icon(Icons.download),
+                    label: const Text('Speichern'),
+                  ),
+                ],
               )
             else
               Center(

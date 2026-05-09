@@ -32,23 +32,32 @@ class AttendanceScreen extends ConsumerWidget {
         ],
       ),
       body: attendeesAsync.when(
-        data: (attendees) => attendees.isEmpty
+        data: (attendees) {
+          final now = DateTime.now();
+          final today = attendees.where((a) => 
+            a.checkinTime != null && 
+            a.checkinTime!.year == now.year && 
+            a.checkinTime!.month == now.month && 
+            a.checkinTime!.day == now.day
+          ).toList();
+
+          return today.isEmpty
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.people_outline, size: 64, color: theme.colorScheme.outline),
                     const SizedBox(height: 16),
-                    const Text('Noch keine Teilnehmer eingecheckt.'),
+                    const Text('Noch keine Teilnehmer für heute eingecheckt.'),
                   ],
                 ),
               )
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
-                itemCount: attendees.length,
+                itemCount: today.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
-                  final attendee = attendees[index];
+                  final attendee = today[index];
                   final checkinStr = attendee.checkinTime != null
                       ? DateFormat('HH:mm').format(attendee.checkinTime!)
                       : '--:--';
@@ -84,7 +93,8 @@ class AttendanceScreen extends ConsumerWidget {
                     ),
                   );
                 },
-              ),
+              );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
           child: Column(
