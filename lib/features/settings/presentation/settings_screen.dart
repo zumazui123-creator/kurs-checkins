@@ -71,21 +71,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             TextField(controller: _addressController, decoration: const InputDecoration(labelText: 'IP Adresse', border: OutlineInputBorder())),
             const SizedBox(height: 16),
             TextField(controller: _portController, decoration: const InputDecoration(labelText: 'Port', border: OutlineInputBorder()), keyboardType: TextInputType.number),
-            ElevatedButton(
-              onPressed: () async {
-                final address = _addressController.text;
-                final port = int.tryParse(_portController.text) ?? 8080;
-                final testUrl = 'http://$address:$port';
-                try {
-                  final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 3)));
-                  await dio.get('$testUrl/');
-                  await settings.setServerConfig(address, port);
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Konfiguration gespeichert')));
-                } catch (e) {
-                  if (mounted) showDialog(context: context, builder: (context) => AlertDialog(title: const Text('Fehler'), content: Text('Server nicht erreichbar: $e')));
-                }
-              },
-              child: const Text('Speichern'),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final port = int.tryParse(_portController.text) ?? 8080;
+                      await settings.setServerConfig(_addressController.text, port);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Konfiguration gespeichert')),
+                        );
+                      }
+                    },
+                    child: const Text('Speichern'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      final address = _addressController.text;
+                      final port = int.tryParse(_portController.text) ?? 8080;
+                      final testUrl = 'http://$address:$port';
+                      
+                      try {
+                        final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 3)));
+                        await dio.get('$testUrl/');
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Verbindung erfolgreich!'), backgroundColor: Colors.green),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Verbindungsfehler'),
+                              content: Text('Server unter $testUrl nicht erreichbar.\n\nFehler: $e'),
+                              actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text('Test Verbindung'),
+                  ),
+                ),
+              ],
             ),
             const Divider(height: 48),
             const Text('Anmeldedaten ändern', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -97,15 +131,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 48),
             const Text('Datenverwaltung', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ElevatedButton(onPressed: () => _eraseAllData(context), style: ElevatedButton.styleFrom(backgroundColor: Colors.red), child: const Text('Alle Daten löschen')),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CourseManagementScreen())),
-              icon: const Icon(Icons.book), label: const Text('Kurse verwalten'),
-            ),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const QrGeneratorScreen())),
-              icon: const Icon(Icons.qr_code), label: const Text('QR Generator öffnen'),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.book, color: Colors.blue),
+                    title: const Text('Kurse verwalten'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const CourseManagementScreen()),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.qr_code, color: Colors.blue),
+                    title: const Text('QR Generator'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const QrGeneratorScreen()),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.delete_forever, color: Colors.red),
+                    title: const Text('Alle Daten löschen', style: TextStyle(color: Colors.red)),
+                    onTap: () => _eraseAllData(context),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
