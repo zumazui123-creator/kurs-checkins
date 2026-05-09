@@ -43,34 +43,30 @@ class AttendanceScreen extends ConsumerWidget {
                   ],
                 ),
               )
-            : ListView.separated(
-                itemCount: attendees.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final attendee = attendees[index];
-                  final checkinStr = attendee.checkinTime != null
-                      ? DateFormat('HH:mm').format(attendee.checkinTime!)
-                      : '--:--';
-
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      child: Text(
-                        attendee.firstName.isNotEmpty ? attendee.firstName[0] : '?',
-                        style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
-                      ),
-                    ),
-                    title: Text('${attendee.firstName} ${attendee.lastName}'),
-                    subtitle: Text(attendee.course),
-                    trailing: Text(
-                      checkinStr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  );
-                },
+            : SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Vorname')),
+                      DataColumn(label: Text('Nachname')),
+                      DataColumn(label: Text('Kurs')),
+                      DataColumn(label: Text('Uhrzeit')),
+                    ],
+                    rows: attendees.map((attendee) {
+                      final checkinStr = attendee.checkinTime != null
+                          ? DateFormat('HH:mm').format(attendee.checkinTime!)
+                          : '--:--';
+                      return DataRow(cells: [
+                        DataCell(Text(attendee.firstName)),
+                        DataCell(Text(attendee.lastName)),
+                        DataCell(Text(attendee.course)),
+                        DataCell(Text(checkinStr)),
+                      ]);
+                    }).toList(),
+                  ),
+                ),
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(

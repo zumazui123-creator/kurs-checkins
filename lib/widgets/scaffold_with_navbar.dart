@@ -17,11 +17,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.list_alt_outlined),
             activeIcon: Icon(Icons.list_alt),
             label: 'Teilnehmer',
@@ -30,11 +25,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
             icon: Icon(Icons.qr_code_scanner),
             activeIcon: Icon(Icons.qr_code_scanner),
             label: 'Scan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code),
-            activeIcon: Icon(Icons.qr_code),
-            label: 'QR',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
@@ -50,29 +40,21 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   static int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    if (location == '/') return 0;
-    if (location == '/attendance') return 1;
-    if (location == '/scan') return 2;
-    if (location == '/generate') return 3;
-    if (location == '/settings') return 4;
+    if (location == '/attendance') return 0;
+    if (location == '/scan') return 1;
+    if (location == '/settings') return 2;
     return 0;
   }
 
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        GoRouter.of(context).go('/');
-        break;
-      case 1:
         GoRouter.of(context).go('/attendance');
         break;
-      case 2:
+      case 1:
         GoRouter.of(context).go('/scan');
         break;
-      case 3:
-        GoRouter.of(context).go('/generate');
-        break;
-      case 4:
+      case 2:
         GoRouter.of(context).go('/settings');
         break;
     }

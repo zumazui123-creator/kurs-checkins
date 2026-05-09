@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'widgets/scaffold_with_navbar.dart';
 
 import 'features/attendance/presentation/attendance_screen.dart';
-import 'features/qr/presentation/qr_generator_screen.dart';
 import 'features/qr/presentation/qr_scanner_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 
@@ -13,7 +12,7 @@ part 'router.g.dart';
 @riverpod
 GoRouter router(Ref ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/attendance',
     routes: [
       ShellRoute(
         builder: (context, state, child) {
@@ -21,20 +20,12 @@ GoRouter router(Ref ref) {
         },
         routes: [
           GoRoute(
-            path: '/',
-            builder: (context, state) => const PlaceholderScreen(title: 'Dashboard'),
-          ),
-          GoRoute(
             path: '/attendance',
             builder: (context, state) => const AttendanceScreen(),
           ),
           GoRoute(
             path: '/scan',
             builder: (context, state) => const QrScannerScreen(),
-          ),
-          GoRoute(
-            path: '/generate',
-            builder: (context, state) => const QrGeneratorScreen(),
           ),
           GoRoute(
             path: '/settings',

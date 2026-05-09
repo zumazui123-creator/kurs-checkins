@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/settings_provider.dart';
+import '../../qr/presentation/qr_generator_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -11,16 +12,17 @@ class SettingsScreen extends ConsumerWidget {
     final controller = TextEditingController(text: settings.url);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Setup')),
-      body: Padding(
+      appBar: AppBar(title: const Text('Setup & QR')),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
+            const Text('Server Einstellungen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
             TextField(
               controller: controller,
               decoration: const InputDecoration(
                 labelText: 'Server URL',
-                hintText: 'http://192.168.178.XX:8080',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -29,16 +31,16 @@ class SettingsScreen extends ConsumerWidget {
               onPressed: () {
                 ref.read(settingsProvider).setServerUrl(controller.text);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Server-URL gespeichert')),
+                  const SnackBar(content: Text('URL gespeichert')),
                 );
               },
               child: const Text('Speichern'),
             ),
-            const SizedBox(height: 32),
-            if (settings.isLoading)
-              const CircularProgressIndicator()
-            else
-              Text('Aktuelle URL: ${settings.url}'),
+            const Divider(height: 48),
+            const Text('QR Code Generator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            // Wir betten den Generator direkt hier ein
+            const SizedBox(height: 600, child: QrGeneratorScreen()),
           ],
         ),
       ),

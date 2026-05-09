@@ -51,7 +51,6 @@ class _QrGeneratorScreenState extends ConsumerState<QrGeneratorScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('QR Generator (Server)')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
