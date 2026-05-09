@@ -7,8 +7,7 @@ class CourseManagementScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseNotifier = ref.watch(courseProvider);
-    final courses = courseNotifier.courses;
+    final courses = ref.watch(courseProvider);
     final courseController = TextEditingController();
 
     return Scaffold(
@@ -25,7 +24,7 @@ class CourseManagementScreen extends ConsumerWidget {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    courseNotifier.addCourse(courseController.text);
+                    ref.read(courseProvider.notifier).addCourse(courseController.text);
                     courseController.clear();
                   },
                 ),
@@ -39,7 +38,7 @@ class CourseManagementScreen extends ConsumerWidget {
                   title: Text(courses[index].name),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => courseNotifier.removeCourse(courses[index].id),
+                    onPressed: () => ref.read(courseProvider.notifier).removeCourse(courses[index].id),
                   ),
                 ),
               ),

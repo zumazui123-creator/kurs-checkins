@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/settings_provider.dart';
@@ -55,12 +56,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
+                final address = _addressController.text;
                 final port = int.tryParse(_portController.text) ?? 8080;
-                await settings.setServerConfig(_addressController.text, port);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Konfiguration gespeichert')),
-                  );
+                final testUrl = 'http://$address:$port';
+
+                try {
+                  // Teste die Verbindung
+                  final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 3)));
+                  await dio.get('$testUrl/');
+
+                  // Bei Erfolg speichern
+                  await settings.setServerConfig(address, port);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Verbindung erfolgreich! Konfiguration gespeichert')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Verbindungsfehler'),
+                        content: Text('Konnte den Server unter $testUrl nicht erreichen.\n\nFehler: $e'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('Speichern'),

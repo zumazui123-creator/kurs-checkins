@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../services/audio_service.dart';
 import '../../../services/api_client.dart';
+import '../../settings/providers/settings_provider.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   const QrScannerScreen({super.key});
@@ -61,10 +62,23 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
           debugPrint('Error: $e');
           await AudioService.playError();
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Fehler beim Senden der Daten.'),
-                backgroundColor: Colors.red,
+            final config = ref.read(settingsProvider).config;
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Verbindungsfehler'),
+                content: Text(
+                  'Der Server konnte nicht erreicht werden.\n\n'
+                  'Versuchte Adresse: ${config.address}\n'
+                  'Versuchter Port: ${config.port}\n\n'
+                  'Bitte prüfe die Einstellungen im Setup-Tab.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
               ),
             );
           }

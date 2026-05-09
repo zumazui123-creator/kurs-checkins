@@ -42,7 +42,7 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final courses = ref.watch(courseProvider).courses;
+    final courses = ref.watch(courseProvider);
     
     // Initialisiere Auswahl, wenn noch nicht gesetzt
     if (_selectedCourse == null && courses.isNotEmpty) {
