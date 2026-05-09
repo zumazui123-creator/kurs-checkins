@@ -6,14 +6,14 @@ Herzlich willkommen zum **Kurs-Checkins** Projekt! Diese App ist eine moderne Fl
 
 ## 🎯 Projekt-Überblick
 
-Die App ermöglicht eine nahtlose Erfassung von Kursteilnehmern mit Fokus auf Geschwindigkeit und Benutzerfreundlichkeit.
+Die App ermöglicht eine nahtlose Erfassung von Kursteilnehmern mit Fokus auf Datenschutz, Geschwindigkeit und Benutzerfreundlichkeit.
 
 ### Hauptfunktionen
-*   **👥 Teilnehmer-Dashboard:** Übersichtliche Liste mit Vorname, Nachname, Uhrzeit und Kurs.
-*   **🔍 QR-Scanning:** Schnelle Erfassung durch Scannen von Teilnehmer-QR-Codes.
-*   **🎲 QR-Generierung:** Erstellen von individuellen QR-Codes für Teilnehmer.
-*   **📝 Manueller Check-in:** Flexibles Eintragen über intuitive Popups.
-*   **🌐 Cross-Platform:** Optimiert für Android, iOS und das Web.
+*   **👥 Teilnehmer-Dashboard:** Übersichtliche Liste mit Teilnehmern des heutigen Tages (Vorname & Uhrzeit).
+*   **🔍 QR-Scanning:** Schnelle Erfassung durch Scannen von Teilnehmer-QR-Codes (Nur Mobile).
+*   **🎲 Lokale QR-Generierung:** Lokale Erstellung von QR-Codes mit Export-Funktion in die Galerie.
+*   **📝 Manueller Check-in:** Flexibles Eintragen von Teilnehmern.
+*   **⚙️ Setup-Bereich:** Konfiguration der Server-Verbindung, Kursverwaltung (mit Drag-and-Drop & CSV-Import) und Passwortschutz.
 
 ---
 
@@ -24,56 +24,47 @@ Die App ermöglicht eine nahtlose Erfassung von Kursteilnehmern mit Fokus auf Ge
 | **Framework** | Flutter (Latest Stable) |
 | **Sprache** | Dart (Sound Null Safety) |
 | **UI System** | Material 3 + FlexColorScheme |
-| **State Management** | Riverpod (Generator Pattern) |
+| **State Management** | Riverpod |
 | **Navigation** | GoRouter |
-| **Datenbank** | In-Memory (Optional: Drift für Lokal) |
-| **Modellierung** | Freezed & JSON Serializable |
+| **Backend** | Dart Frog (mit `barcode`-Lib für serverseitige QR-Erstellung) |
+| **Daten** | Shared Preferences & REST API (Dio) |
 
 ---
 
 ## 🚀 Setup & Ausführung
 
-### 1. Abhängigkeiten laden
+### 1. Server Starten
 ```bash
-flutter pub get
+cd server
+dart pub get
+dart_frog dev --address 0.0.0.0 --port 8080
 ```
 
-### 2. Code Generierung
-Da wir Riverpod Generator und Freezed nutzen, muss der Builder laufen:
+### 2. App Starten
 ```bash
-dart run build_runner build --delete-conflicting-outputs
-```
-
-### 3. App Starten
-```bash
-flutter run -d chrome  # Für Web
-# oder
-flutter run            # Für mobile Geräte
+flutter run
 ```
 
 ---
 
 ## 📐 Entwicklungskonventionen
 
-### 🎨 UI & Design
-*   **Material 3:** Konsequent `useMaterial3: true` verwenden.
-*   **Declarative UI:** Widgets reagieren ausschließlich auf Provider-States.
-*   **Responsive:** Layouts müssen auf Mobile und Web gleichermaßen funktionieren.
-
 ### 🏗 Architektur-Schichten
-1.  **Presentation (UI):** Dumme Widgets & Screens.
-2.  **Application (Providers):** Notifier für Business-Logik & State.
-3.  **Data (Repos):** Schnittstellen zu Drift oder SharedPreferences (lokal).
+1.  **Presentation (UI):** Dumme Widgets & Screens, die auf Riverpod-Provider hören.
+2.  **Domain (Models):** `Attendee`, `Course`, `ServerConfig`.
+3.  **Data/Services:** `ApiClient` (Dio), `CourseProvider` (SharedPreferences).
 
-### 💉 State Management (The Riverpod Way)
-*   Nutze immer den **Riverpod Generator** (`@riverpod`).
-*   State-Klassen sind **immer** immutable (via `@freezed`).
-*   Handle `AsyncValue` (data, loading, error) explizit in der UI.
+### 🔒 Sicherheit & Konfiguration
+*   **Auth:** Der Setup-Bereich ist durch einen PIN-Dialog geschützt (Default: `admin`/`admin`).
+*   **Dynamik:** Die Server-Verbindung (IP/Port) ist im Setup-Bereich konfigurierbar und wird mittels SHA-256 (Passwort) und SharedPreferences persistiert.
+*   **Datenschutz:** Teilnehmerliste filtert automatisch auf das heutige Datum und zeigt aus Anonymitätsgründen nur Vornamen und Ankunftszeiten an.
 
 ---
 
 ## 📝 Wichtige Dateien
-*   `lib/router.dart`: Zentrale Routen-Konfiguration.
-*   `lib/main.dart`: App-Entrypoint & Theme-Setup.
-*   `GEMINI.md`: Diese Dokumentation (Source of Truth).
-*   `TODO.md`: Aktueller Projektstatus & Roadmap.
+*   `lib/router.dart`: Zentrale Navigation (GoRouter).
+*   `lib/main.dart`: Provider-Initialisierung & App-Entrypoint.
+*   `lib/features/settings/providers/course_provider.dart`: Kursverwaltung.
+*   `server/routes/qr.dart`: Serverseitige QR-Code Generierung.
+*   `TODO.md`: Roadmap.
+---
