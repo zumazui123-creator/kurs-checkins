@@ -19,13 +19,15 @@ class Attendee {
 
   factory Attendee.fromJson(Map<String, dynamic> json) {
     return Attendee(
-      id: json['id'] as String,
-      firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
-      course: json['course'] as String,
-      checkinTime: json['checkinTime'] != null ? DateTime.parse(json['checkinTime'] as String) : null,
-      startTime: json['startTime'] as String?,
-      endTime: json['endTime'] as String?,
+      id: (json['id'] ?? '') as String,
+      firstName: (json['firstName'] ?? json['first_name'] ?? '') as String,
+      lastName: (json['lastName'] ?? json['last_name'] ?? '') as String,
+      course: (json['course'] ?? '') as String,
+      checkinTime: json['checkinTime'] != null 
+          ? DateTime.tryParse(json['checkinTime'] as String) 
+          : (json['checkin_time'] != null ? DateTime.tryParse(json['checkin_time'] as String) : null),
+      startTime: (json['startTime'] ?? json['start_time']) as String?,
+      endTime: (json['endTime'] ?? json['end_time']) as String?,
     );
   }
 
