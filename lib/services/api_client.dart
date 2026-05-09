@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/settings/providers/settings_provider.dart';
 
 final apiClientProvider = Provider<Dio>((ref) {
-  final settings = ref.watch(settingsProvider);
-  final baseUrl = settings.url ?? 'http://10.0.2.15:8080';
+  // Beobachte die URL direkt. Wenn sie sich ändert, wird dieser Provider neu berechnet.
+  final baseUrl = ref.watch(settingsProvider.select((s) => s.url)) ?? 'http://10.0.2.15:8080';
+  
   return Dio(BaseOptions(
     baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 5),
