@@ -12,8 +12,8 @@ class SettingsScreen extends ConsumerWidget {
     final controller = TextEditingController(text: settings.url);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Setup & QR')),
-      body: SingleChildScrollView(
+      appBar: AppBar(title: const Text('Setup')),
+      body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
@@ -36,11 +36,21 @@ class SettingsScreen extends ConsumerWidget {
               },
               child: const Text('Speichern'),
             ),
-            const Divider(height: 48),
-            const Text('QR Code Generator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            // Wir betten den Generator direkt hier ein
-            const SizedBox(height: 600, child: QrGeneratorScreen()),
+            Text('Aktive Verbindung: ${settings.url}',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+            const Divider(height: 48),
+            const Text('QR Tools', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const QrGeneratorScreen()),
+                );
+              },
+              icon: const Icon(Icons.qr_code),
+              label: const Text('QR Generator öffnen'),
+            ),
           ],
         ),
       ),
