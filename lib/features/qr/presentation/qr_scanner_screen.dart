@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../services/audio_service.dart';
-import 'package:uuid/uuid.dart';
-import '../../attendance/domain/attendee.dart';
-import '../../attendance/providers/attendance_provider.dart';
+import '../../../services/api_client.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   const QrScannerScreen({super.key});
@@ -34,21 +32,20 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
               data.containsKey('firstName') &&
               data.containsKey('lastName')) {
             
-            final attendee = Attendee(
-              id: const Uuid().v4(),
-              firstName: data['firstName'],
-              lastName: data['lastName'],
-              course: 'Scan-Kurs',
-              checkinTime: DateTime.now(),
-            );
+            final dio = ref.read(apiClientProvider);
+            await dio.post('/attendance', data: {
+              'firstName': data['firstName'],
+              'lastName': data['lastName'],
+              'course': data['course'] ?? 'Scan-Kurs',
+              'checkin_time': DateTime.now().toIso8601String(),
+            });
 
-            await ref.read(attendanceProvider.notifier).addAttendee(attendee);
             await AudioService.playSuccess();
 
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${attendee.firstName} ${attendee.lastName} eingecheckt!'),
+                  content: Text('${data['firstName']} ${data['lastName']} erfolgreich gesendet!'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -57,11 +54,12 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
             throw Exception('Invalid format');
           }
         } catch (e) {
+          debugPrint('Error: $e');
           await AudioService.playError();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Ungültiger QR-Code Format.'),
+                content: Text('Fehler beim Senden der Daten.'),
                 backgroundColor: Colors.red,
               ),
             );
