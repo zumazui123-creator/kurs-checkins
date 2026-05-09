@@ -39,10 +39,14 @@ class CourseManagementScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.separated(
+              child: ReorderableListView.builder(
+                padding: const EdgeInsets.only(top: 16),
                 itemCount: courses.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                onReorder: (int oldIndex, int newIndex) {
+                  ref.read(courseProvider.notifier).reorderCourses(oldIndex, newIndex);
+                },
                 itemBuilder: (context, index) => Card(
+                  key: ValueKey(courses[index].id),
                   child: ListTile(
                     title: Text(courses[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${courses[index].startTime} - ${courses[index].endTime}'),

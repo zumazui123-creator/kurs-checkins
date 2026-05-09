@@ -46,6 +46,17 @@ class CourseNotifier extends Notifier<List<Course>> {
     await _save();
   }
 
+  Future<void> reorderCourses(int oldIndex, int newIndex) async {
+    final courses = [...state];
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = courses.removeAt(oldIndex);
+    courses.insert(newIndex, item);
+    state = courses;
+    await _save();
+  }
+
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonStringList = state.map((c) => jsonEncode(c.toJson())).toList();
