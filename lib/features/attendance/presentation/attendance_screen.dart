@@ -43,28 +43,44 @@ class AttendanceScreen extends ConsumerWidget {
                   ],
                 ),
               )
-            : SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columnSpacing: 20,
-                    dataRowMaxHeight: 50,
-                    columns: const [
-                      DataColumn(label: Expanded(child: Center(child: Text('Vorname')))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Uhrzeit')))),
-                    ],
-                    rows: attendees.map((attendee) {
-                      final checkinStr = attendee.checkinTime != null
-                          ? DateFormat('HH:mm').format(attendee.checkinTime!)
-                          : '--:--';
-                      return DataRow(cells: [
-                        DataCell(Center(child: Text(attendee.firstName))),
-                        DataCell(Center(child: Text(checkinStr))),
-                      ]);
-                    }).toList(),
-                  ),
-                ),
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: attendees.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final attendee = attendees[index];
+                  final checkinStr = attendee.checkinTime != null
+                      ? DateFormat('HH:mm').format(attendee.checkinTime!)
+                      : '--:--';
+                  
+                  return Card(
+                    elevation: 1,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        child: Text(
+                          attendee.firstName[0].toUpperCase(),
+                          style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
+                        ),
+                      ),
+                      title: Text(attendee.firstName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          checkinStr,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(

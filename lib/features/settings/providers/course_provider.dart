@@ -28,9 +28,14 @@ class CourseNotifier extends Notifier<List<Course>> {
     }
   }
 
-  Future<void> addCourse(String name) async {
+  Future<void> addCourse(String name, String startTime, String endTime) async {
     if (name.isNotEmpty) {
-      final newCourse = Course(id: const Uuid().v4(), name: name);
+      final newCourse = Course(
+        id: const Uuid().v4(), 
+        name: name, 
+        startTime: startTime, 
+        endTime: endTime
+      );
       state = [...state, newCourse];
       await _save();
     }

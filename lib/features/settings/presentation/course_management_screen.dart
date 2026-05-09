@@ -8,37 +8,48 @@ class CourseManagementScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courses = ref.watch(courseProvider);
-    final courseController = TextEditingController();
+    final nameController = TextEditingController();
+    final startController = TextEditingController();
+    final endController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Kurse verwalten')),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: courseController,
-              decoration: InputDecoration(
-                labelText: 'Neuer Kurs',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    ref.read(courseProvider.notifier).addCourse(courseController.text);
-                    courseController.clear();
-                  },
-                ),
-              ),
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Kursname', border: OutlineInputBorder())),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(child: TextField(controller: startController, decoration: const InputDecoration(labelText: 'Von (HH:MM)'))),
+                const SizedBox(width: 8),
+                Expanded(child: TextField(controller: endController, decoration: const InputDecoration(labelText: 'Bis (HH:MM)'))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(courseProvider.notifier).addCourse(nameController.text, startController.text, endController.text);
+                nameController.clear();
+                startController.clear();
+                endController.clear();
+              },
+              child: const Text('Kurs hinzufügen'),
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
+              child: ListView.separated(
                 itemCount: courses.length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text(courses[index].name),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => ref.read(courseProvider.notifier).removeCourse(courses[index].id),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, index) => Card(
+                  child: ListTile(
+                    title: Text(courses[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('${courses[index].startTime} - ${courses[index].endTime}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => ref.read(courseProvider.notifier).removeCourse(courses[index].id),
+                    ),
                   ),
                 ),
               ),
