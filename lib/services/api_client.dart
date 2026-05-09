@@ -2,12 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/settings/providers/settings_provider.dart';
 
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../features/settings/providers/settings_provider.dart';
+
 final apiClientProvider = Provider<Dio>((ref) {
-  // Beobachte die URL direkt. Wenn sie sich ändert, wird dieser Provider neu berechnet.
-  final baseUrl = ref.watch(settingsProvider.select((s) => s.url)) ?? 'http://10.0.2.15:8080';
+  final config = ref.watch(settingsProvider).config;
   
   return Dio(BaseOptions(
-    baseUrl: baseUrl,
+    baseUrl: config.toUrl(),
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 3),
   ));

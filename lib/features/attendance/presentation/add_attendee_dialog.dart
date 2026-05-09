@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/attendee.dart';
 import '../providers/attendance_provider.dart';
+import '../../settings/providers/course_provider.dart';
 
 class AddAttendeeDialog extends ConsumerStatefulWidget {
   const AddAttendeeDialog({super.key});
@@ -15,14 +16,7 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  String _selectedCourse = 'Flutter Advanced';
-
-  final List<String> _courses = [
-    'Flutter Advanced',
-    'Dart Basics',
-    'UI/UX Design',
-    'Backend with Supabase',
-  ];
+  String? _selectedCourse;
 
   @override
   void dispose() {
@@ -32,12 +26,12 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _selectedCourse != null) {
       final attendee = Attendee(
         id: const Uuid().v4(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        course: _selectedCourse,
+        course: _selectedCourse!,
         checkinTime: DateTime.now(),
       );
 
@@ -48,6 +42,13 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final courses = ref.watch(courseProvider).courses;
+    
+    // Initialisiere Auswahl, wenn noch nicht gesetzt
+    if (_selectedCourse == null && courses.isNotEmpty) {
+      _selectedCourse = courses.first.name;
+    }
+
     return AlertDialog(
       title: const Text('Teilnehmer hinzufügen'),
       content: Form(
@@ -76,26 +77,29 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
                     value == null || value.isEmpty ? 'Pflichtfeld' : null,
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedCourse,
-                decoration: const InputDecoration(
-                  labelText: 'Kurs',
-                  prefixIcon: Icon(Icons.book_outlined),
+              if (courses.isEmpty)
+                const Text('Keine Kurse verfügbar. Bitte im Setup hinzufügen.', style: TextStyle(color: Colors.red)),
+              if (courses.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _selectedCourse,
+                  decoration: const InputDecoration(
+                    labelText: 'Kurs',
+                    prefixIcon: Icon(Icons.book_outlined),
+                  ),
+                  items: courses.map((course) {
+                    return DropdownMenuItem<String>(
+                      value: course.name,
+                      child: Text(course.name),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedCourse = newValue;
+                      });
+                    }
+                  },
                 ),
-                items: _courses.map((String course) {
-                  return DropdownMenuItem<String>(
-                    value: course,
-                    child: Text(course),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedCourse = newValue;
-                    });
-                  }
-                },
-              ),
             ],
           ),
         ),
@@ -106,7 +110,7 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
           child: const Text('Abbrechen'),
         ),
         FilledButton(
-          onPressed: _submit,
+          onPressed: courses.isEmpty ? null : _submit,
           child: const Text('Speichern'),
         ),
       ],

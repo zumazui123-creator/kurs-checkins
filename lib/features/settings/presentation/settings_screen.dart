@@ -12,18 +12,26 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  late TextEditingController _urlController;
+  late TextEditingController _addressController;
+  late TextEditingController _portController;
 
   @override
   void initState() {
     super.initState();
-    final settings = ref.read(settingsProvider);
-    _urlController = TextEditingController(text: settings.url);
+    final config = ref.read(settingsProvider).config;
+    _addressController = TextEditingController(text: config.address);
+    _portController = TextEditingController(text: config.port.toString());
+  }
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    _portController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Beobachte Notifier für Reaktivität
     final settings = ref.watch(settingsProvider);
     final courseNotifier = ref.watch(courseProvider);
     final courses = courseNotifier.courses;
@@ -40,22 +48,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const Text('Server Einstellungen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextField(
-              controller: _urlController,
-              decoration: const InputDecoration(labelText: 'Server URL', border: OutlineInputBorder()),
+              controller: _addressController,
+              decoration: const InputDecoration(labelText: 'IP Adresse', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _portController,
+              decoration: const InputDecoration(labelText: 'Port', border: OutlineInputBorder()),
+              keyboardType: TextInputType.number,
             ),
             ElevatedButton(
               onPressed: () async {
-                await settings.setServerUrl(_urlController.text);
+                final port = int.tryParse(_portController.text) ?? 8080;
+                await settings.setServerConfig(_addressController.text, port);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('URL gespeichert')),
+                    const SnackBar(content: Text('Konfiguration gespeichert')),
                   );
                 }
               },
-              child: const Text('URL Speichern'),
+              child: const Text('Speichern'),
             ),
             const SizedBox(height: 16),
-            Text('Aktive Verbindung: ${settings.url}',
+            Text('Aktive Verbindung: ${settings.config.toUrl()}',
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
             const Divider(height: 48),
             const Text('Kurse verwalten', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -77,10 +92,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: courses.length,
               itemBuilder: (context, index) => ListTile(
-                title: Text(courses[index]),
+                title: Text(courses[index].name),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => courseNotifier.removeCourse(courses[index]),
+                  onPressed: () => courseNotifier.removeCourse(courses[index].id),
                 ),
               ),
             ),

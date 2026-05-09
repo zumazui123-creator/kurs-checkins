@@ -1,16 +1,16 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../domain/server_config.dart';
 
 class SettingsNotifier extends ChangeNotifier {
-  static const _key = 'server_url';
-  static const _defaultUrl = 'http://10.0.2.15:8080';
+  static const _key = 'server_config';
+  static final _defaultConfig = ServerConfig(address: '10.0.2.15', port: 8080);
   
-  String? _url;
-  bool _isLoading = true;
+  ServerConfig _config = _defaultConfig;
 
-  String? get url => _url;
-  bool get isLoading => _isLoading;
+  ServerConfig get config => _config;
 
   SettingsNotifier() {
     _load();
@@ -18,18 +18,17 @@ class SettingsNotifier extends ChangeNotifier {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    _url = prefs.getString(_key) ?? _defaultUrl;
-    _isLoading = false;
+    final jsonString = prefs.getString(_key);
+    if (jsonString != null) {
+      _config = ServerConfig.fromJson(jsonDecode(jsonString));
+    }
     notifyListeners();
   }
 
-  Future<void> setServerUrl(String url) async {
-    _isLoading = true;
-    notifyListeners();
+  Future<void> setServerConfig(String address, int port) async {
+    _config = ServerConfig(address: address, port: port);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_key, url);
-    _url = url;
-    _isLoading = false;
+    await prefs.setString(_key, jsonEncode(_config.toJson()));
     notifyListeners();
   }
 }
