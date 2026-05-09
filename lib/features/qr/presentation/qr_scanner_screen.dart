@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -15,6 +17,8 @@ class QrScannerScreen extends ConsumerStatefulWidget {
 class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
   final MobileScannerController controller = MobileScannerController();
   bool _isProcessing = false;
+
+  bool get _isSupported => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   void _onDetect(BarcodeCapture capture) async {
     if (_isProcessing) return;
@@ -79,6 +83,15 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_isSupported) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('QR Scanner')),
+        body: const Center(
+          child: Text('QR-Scanner ist nur auf Android/iOS verfügbar.'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('QR Scanner'),
@@ -100,14 +113,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
             onPressed: () => controller.toggleTorch(),
           ),
           IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: controller,
-              builder: (context, state, child) {
-                // In some versions it's facing, in others cameraFacing.
-                // We'll use a more generic approach or default.
-                return const Icon(Icons.cameraswitch);
-              },
-            ),
+            icon: const Icon(Icons.cameraswitch),
             onPressed: () => controller.switchCamera(),
           ),
         ],

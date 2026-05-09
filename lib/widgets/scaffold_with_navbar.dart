@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'auth_dialog.dart';
 
 class ScaffoldWithNavBar extends StatelessWidget {
   const ScaffoldWithNavBar({
@@ -55,7 +56,15 @@ class ScaffoldWithNavBar extends StatelessWidget {
         GoRouter.of(context).go('/scan');
         break;
       case 2:
-        GoRouter.of(context).go('/settings');
+        showDialog(
+          context: context,
+          builder: (context) => AuthDialog(
+            onSuccess: () {
+              Navigator.pop(context);
+              GoRouter.of(context).go('/settings');
+            },
+          ),
+        );
         break;
     }
   }
