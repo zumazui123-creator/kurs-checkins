@@ -4,17 +4,30 @@ import '../providers/settings_provider.dart';
 import '../providers/course_provider.dart';
 import '../../qr/presentation/qr_generator_screen.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Überwache die Notifier selbst, damit das Widget neu gebaut wird, wenn notifyListeners() aufgerufen wird
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  late TextEditingController _urlController;
+
+  @override
+  void initState() {
+    super.initState();
+    final settings = ref.read(settingsProvider);
+    _urlController = TextEditingController(text: settings.url);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Beobachte Notifier für Reaktivität
     final settings = ref.watch(settingsProvider);
     final courseNotifier = ref.watch(courseProvider);
     final courses = courseNotifier.courses;
     
-    final urlController = TextEditingController(text: settings.url);
     final courseController = TextEditingController();
 
     return Scaffold(
@@ -27,13 +40,23 @@ class SettingsScreen extends ConsumerWidget {
             const Text('Server Einstellungen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextField(
-              controller: urlController,
+              controller: _urlController,
               decoration: const InputDecoration(labelText: 'Server URL', border: OutlineInputBorder()),
             ),
             ElevatedButton(
-              onPressed: () => settings.setServerUrl(urlController.text),
+              onPressed: () async {
+                await settings.setServerUrl(_urlController.text);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('URL gespeichert')),
+                  );
+                }
+              },
               child: const Text('URL Speichern'),
             ),
+            const SizedBox(height: 16),
+            Text('Aktive Verbindung: ${settings.url}',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
             const Divider(height: 48),
             const Text('Kurse verwalten', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             TextField(
