@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/settings_provider.dart';
-import '../providers/course_provider.dart';
+import 'course_management_screen.dart';
 import '../../qr/presentation/qr_generator_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -33,10 +33,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    final courseNotifier = ref.watch(courseProvider);
-    final courses = courseNotifier.courses;
-    
-    final courseController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Setup')),
@@ -73,34 +69,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Text('Aktive Verbindung: ${settings.config.toUrl()}',
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
             const Divider(height: 48),
-            const Text('Kurse verwalten', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            TextField(
-              controller: courseController,
-              decoration: InputDecoration(
-                labelText: 'Neuer Kurs',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    courseNotifier.addCourse(courseController.text);
-                    courseController.clear();
-                  },
-                ),
+            const Text('Datenverwaltung', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CourseManagementScreen()),
               ),
+              icon: const Icon(Icons.book),
+              label: const Text('Kurse verwalten'),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: courses.length,
-              itemBuilder: (context, index) => ListTile(
-                title: Text(courses[index].name),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => courseNotifier.removeCourse(courses[index].id),
-                ),
-              ),
-            ),
-            const Divider(height: 48),
-            const Text('QR Tools', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => Navigator.of(context).push(
