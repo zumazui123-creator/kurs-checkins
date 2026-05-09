@@ -48,21 +48,19 @@ class AttendanceScreen extends ConsumerWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
+                    columnSpacing: 20,
+                    dataRowMaxHeight: 50,
                     columns: const [
-                      DataColumn(label: Text('Vorname')),
-                      DataColumn(label: Text('Nachname')),
-                      DataColumn(label: Text('Kurs')),
-                      DataColumn(label: Text('Uhrzeit')),
+                      DataColumn(label: Expanded(child: Center(child: Text('Vorname')))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Uhrzeit')))),
                     ],
                     rows: attendees.map((attendee) {
                       final checkinStr = attendee.checkinTime != null
                           ? DateFormat('HH:mm').format(attendee.checkinTime!)
                           : '--:--';
                       return DataRow(cells: [
-                        DataCell(Text(attendee.firstName)),
-                        DataCell(Text(attendee.lastName)),
-                        DataCell(Text(attendee.course)),
-                        DataCell(Text(checkinStr)),
+                        DataCell(Center(child: Text(attendee.firstName))),
+                        DataCell(Center(child: Text(checkinStr))),
                       ]);
                     }).toList(),
                   ),
