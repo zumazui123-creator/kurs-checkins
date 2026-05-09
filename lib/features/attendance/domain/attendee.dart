@@ -1,19 +1,43 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+class Attendee {
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String course;
+  final DateTime? checkinTime;
+  final String? startTime;
+  final String? endTime;
 
-part 'attendee.freezed.dart';
-part 'attendee.g.dart';
+  Attendee({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.course,
+    this.checkinTime,
+    this.startTime,
+    this.endTime,
+  });
 
-@freezed
-abstract class Attendee with _$Attendee {
-  const factory Attendee({
-    required String id,
-    @JsonKey(name: 'first_name') required String firstName,
-    @JsonKey(name: 'last_name') required String lastName,
-    required String course,
-    @JsonKey(name: 'checkin_time') DateTime? checkinTime,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-  }) = _Attendee;
+  factory Attendee.fromJson(Map<String, dynamic> json) {
+    return Attendee(
+      id: json['id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      course: json['course'] as String,
+      checkinTime: json['checkinTime'] != null ? DateTime.parse(json['checkinTime'] as String) : null,
+      startTime: json['startTime'] as String?,
+      endTime: json['endTime'] as String?,
+    );
+  }
 
-  factory Attendee.fromJson(Map<String, dynamic> json) => _$AttendeeFromJson(json);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'course': course,
+      'checkinTime': checkinTime?.toIso8601String(),
+      'startTime': startTime,
+      'endTime': endTime,
+    };
+  }
 }

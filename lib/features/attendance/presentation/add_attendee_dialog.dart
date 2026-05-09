@@ -27,12 +27,17 @@ class _AddAttendeeDialogState extends ConsumerState<AddAttendeeDialog> {
 
   void _submit() {
     if (_formKey.currentState!.validate() && _selectedCourse != null) {
+      final courses = ref.read(courseProvider);
+      final course = courses.firstWhere((c) => c.name == _selectedCourse);
+      
       final attendee = Attendee(
         id: const Uuid().v4(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         course: _selectedCourse!,
         checkinTime: DateTime.now(),
+        startTime: course.startTime,
+        endTime: course.endTime,
       );
 
       ref.read(attendanceProvider.notifier).addAttendee(attendee);

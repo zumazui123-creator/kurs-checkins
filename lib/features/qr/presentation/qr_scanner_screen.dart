@@ -7,6 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../services/audio_service.dart';
 import '../../../services/api_client.dart';
 import '../../settings/providers/settings_provider.dart';
+import '../../settings/providers/course_provider.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   const QrScannerScreen({super.key});
@@ -37,12 +38,18 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
               data.containsKey('firstName') &&
               data.containsKey('lastName')) {
             
+            final courseName = data['course'] ?? 'Scan-Kurs';
+            final courses = ref.read(courseProvider);
+            final course = courses.where((c) => c.name == courseName).firstOrNull;
+
             final dio = ref.read(apiClientProvider);
             await dio.post('/attendance', data: {
               'firstName': data['firstName'],
               'lastName': data['lastName'],
-              'course': data['course'] ?? 'Scan-Kurs',
-              'checkin_time': DateTime.now().toIso8601String(),
+              'course': courseName,
+              'checkinTime': DateTime.now().toIso8601String(),
+              'startTime': course?.startTime ?? '',
+              'endTime': course?.endTime ?? '',
             });
 
             await AudioService.playSuccess();
