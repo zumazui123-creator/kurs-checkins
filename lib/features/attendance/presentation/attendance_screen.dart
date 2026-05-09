@@ -64,6 +64,9 @@ class AttendanceScreen extends ConsumerWidget {
                         ),
                       ),
                       title: Text(attendee.firstName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text((attendee.startTime ?? '').isNotEmpty || (attendee.endTime ?? '').isNotEmpty
+                          ? '${attendee.startTime ?? ''} - ${attendee.endTime ?? ''}'
+                          : ''),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
