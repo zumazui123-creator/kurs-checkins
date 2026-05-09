@@ -48,11 +48,21 @@ class CourseManagementScreen extends ConsumerWidget {
                 itemBuilder: (context, index) => Card(
                   key: ValueKey(courses[index].id),
                   child: ListTile(
-                    title: Text(courses[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${courses[index].startTime} - ${courses[index].endTime}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => ref.read(courseProvider.notifier).removeCourse(courses[index].id),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    title: Text(
+                      courses[index].name,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    subtitle: Text(
+                      '${courses[index].startTime} - ${courses[index].endTime}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    trailing: Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red, size: 28),
+                        onPressed: () => ref.read(courseProvider.notifier).removeCourse(courses[index].id),
+                      ),
                     ),
                   ),
                 ),
