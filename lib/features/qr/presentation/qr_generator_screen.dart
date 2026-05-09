@@ -1,18 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../services/api_client.dart';
 
-class QrGeneratorScreen extends StatefulWidget {
+class QrGeneratorScreen extends ConsumerStatefulWidget {
   const QrGeneratorScreen({super.key});
 
   @override
-  State<QrGeneratorScreen> createState() => _QrGeneratorScreenState();
+  ConsumerState<QrGeneratorScreen> createState() => _QrGeneratorScreenState();
 }
 
-class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
+class _QrGeneratorScreenState extends ConsumerState<QrGeneratorScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  String _qrData = '';
+  String? _qrUrl;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,9 +30,19 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
         'firstName': _firstNameController.text.trim(),
         'lastName': _lastNameController.text.trim(),
       };
+      
       setState(() {
-        _qrData = jsonEncode(data);
+        _isLoading = true;
+        final baseUrl = ref.read(apiClientProvider).options.baseUrl;
+        _qrUrl = '$baseUrl/qr?data=${Uri.encodeComponent(jsonEncode(data))}';
       });
+
+      // Simuliere Ladezeit oder warte, bis das Bild geladen ist
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) setState(() => _isLoading = false);
+      });
+    } else {
+      setState(() => _qrUrl = null);
     }
   }
 
@@ -38,7 +51,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('QR Generator')),
+      appBar: AppBar(title: const Text('QR Generator (Server)')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -70,7 +83,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            if (_qrData.isNotEmpty)
+            if (_qrUrl != null)
               Column(
                 children: [
                   Container(
@@ -86,39 +99,20 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                         ),
                       ],
                     ),
-                    child: QrImageView(
-                      data: _qrData,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement share
-                        },
-                        icon: const Icon(Icons.share),
-                        label: const Text('Teilen'),
-                      ),
-                      const SizedBox(width: 16),
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement download
-                        },
-                        icon: const Icon(Icons.download),
-                        label: const Text('Download'),
-                      ),
-                    ],
+                    child: _isLoading
+                        ? const SizedBox(width: 200, height: 200, child: Center(child: CircularProgressIndicator()))
+                        : SvgPicture.network(
+                            _qrUrl!,
+                            width: 200,
+                            height: 200,
+                          ),
                   ),
                 ],
               )
             else
               Center(
                 child: Text(
-                  'Gib einen Namen ein, um einen QR-Code zu generieren.',
+                  'Gib einen Namen ein, um einen QR-Code auf dem Server zu generieren.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.outline),
                 ),

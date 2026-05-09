@@ -52,6 +52,7 @@ dependencies:
   path_provider: ^2.1.5
   dio: ^5.9.2
   audioplayers: ^6.6.0
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
