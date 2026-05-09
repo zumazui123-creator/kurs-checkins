@@ -9,8 +9,11 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Überwache die Notifier selbst, damit das Widget neu gebaut wird, wenn notifyListeners() aufgerufen wird
     final settings = ref.watch(settingsProvider);
-    final courses = ref.watch(courseProvider).courses;
+    final courseNotifier = ref.watch(courseProvider);
+    final courses = courseNotifier.courses;
+    
     final urlController = TextEditingController(text: settings.url);
     final courseController = TextEditingController();
 
@@ -28,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
               decoration: const InputDecoration(labelText: 'Server URL', border: OutlineInputBorder()),
             ),
             ElevatedButton(
-              onPressed: () => ref.read(settingsProvider).setServerUrl(urlController.text),
+              onPressed: () => settings.setServerUrl(urlController.text),
               child: const Text('URL Speichern'),
             ),
             const Divider(height: 48),
@@ -40,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    ref.read(courseProvider).addCourse(courseController.text);
+                    courseNotifier.addCourse(courseController.text);
                     courseController.clear();
                   },
                 ),
@@ -54,7 +57,7 @@ class SettingsScreen extends ConsumerWidget {
                 title: Text(courses[index]),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => ref.read(courseProvider).removeCourse(courses[index]),
+                  onPressed: () => courseNotifier.removeCourse(courses[index]),
                 ),
               ),
             ),
