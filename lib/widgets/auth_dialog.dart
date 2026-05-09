@@ -1,21 +1,28 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../features/settings/providers/settings_provider.dart';
 
-class AuthDialog extends StatefulWidget {
+class AuthDialog extends ConsumerStatefulWidget {
   final VoidCallback onSuccess;
 
   const AuthDialog({super.key, required this.onSuccess});
 
   @override
-  State<AuthDialog> createState() => _AuthDialogState();
+  ConsumerState<AuthDialog> createState() => _AuthDialogState();
 }
 
-class _AuthDialogState extends State<AuthDialog> {
+class _AuthDialogState extends ConsumerState<AuthDialog> {
   final _userController = TextEditingController();
   final _passController = TextEditingController();
   String? _error;
 
   void _checkAuth() {
-    if (_userController.text == 'local' && _passController.text == '1234') {
+    final config = ref.read(settingsProvider).config;
+    final hashedInput = sha256.convert(utf8.encode(_passController.text)).toString();
+    
+    if (_userController.text == config.username && hashedInput == config.password) {
       widget.onSuccess();
     } else {
       setState(() => _error = 'Falsche Zugangsdaten');
